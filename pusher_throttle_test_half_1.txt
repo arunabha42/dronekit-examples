@@ -1,0 +1,44 @@
+
+Throttle:	0 %
+PWM:		1000 us
+Current avg:	0.0 A
+
+Throttle:	5 %
+PWM:		1050 us
+Current avg:	0.5 A
+
+Throttle:	10 %
+PWM:		1100 us
+Current avg:	1.5 A
+
+Throttle:	15 %
+PWM:		1150 us
+Current avg:	2.5 A
+
+Throttle:	20 %
+PWM:		1200 us
+Current avg:	3.5 A
+
+Throttle:	25 %
+PWM:		1250 us
+Current avg:	4.5 A
+
+Throttle:	30 %
+PWM:		1300 us
+Current avg:	5.5 A
+
+Throttle:	35 %
+PWM:		1350 us
+Current avg:	6.5 A
+
+Throttle:	40 %
+PWM:		1400 us
+Current avg:	7.5 A
+
+Throttle:	45 %
+PWM:		1450 us
+Current avg:	8.5 A
+
+Throttle:	50 %
+PWM:		1500 us
+Current avg:	9.5 A
