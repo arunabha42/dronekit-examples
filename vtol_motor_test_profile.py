@@ -1,4 +1,3 @@
-from multiprocessing.connection import wait
 import time
 import sys
 
@@ -23,9 +22,8 @@ def _set_passthrough_rcin3(vehicle, vtol_motor_channels):
 def _reset_original_params(vehicle, vtol_motor_channels, arming_check):    
     
     # Reset arming check value
-    vehicle.parameters["ARMING_CHECK"] = arming_check    
-    # Reset BRD_SAFETY_MASK
-    vehicle.parameters["BRD_SAFETY_MASK"] = 0    
+    vehicle.parameters["ARMING_CHECK"] = arming_check  
+    
     # Reset to VTOL motor functions
     for channel, servo_fn in zip(vtol_motor_channels, range(33,37)):
         vehicle.parameters[f"SERVO{channel}_FUNCTION"] = servo_fn
@@ -33,7 +31,7 @@ def _reset_original_params(vehicle, vtol_motor_channels, arming_check):
 def ramp_motor(vehicle, pwm_start, pwm_stop, duration):
 
     start_time = time.time()
-    ramp_steps = 5
+    ramp_steps = 10
     ramp_increment = int((pwm_stop - pwm_start)/ramp_steps)
 
     print(f"\nRamp: {pwm_start} us to {pwm_stop}")
@@ -68,12 +66,11 @@ def spin_motor_sec(vehicle, pwm_min, pwm_max, duration, thr_out_pct=0.0):
 
 def run_motor_profile(vehicle, pwm_min, pwm_max, duration, hover_thr_pct):
     
-    spool_sec = 4
+    spool_sec = 3
     takeoff_sec = 2
     hover_sec = duration
 
-    # q_m_spin_min = vehicle.parameters["Q_M_SPIN_MIN"]
-    q_m_spin_min = 0.2
+    q_m_spin_min = vehicle.parameters["Q_M_SPIN_MIN"]
     pwm_spin_min = int(pwm_min + (q_m_spin_min * (pwm_max-pwm_min)))
     
 
@@ -83,8 +80,10 @@ def run_motor_profile(vehicle, pwm_min, pwm_max, duration, hover_thr_pct):
     spin_motor_sec(vehicle, pwm_min, pwm_max, spool_sec, q_m_spin_min)
 
     # Takeoff - ramp to 80% over 2 seconds
-    ramp_to = int(pwm_min + 0.4*(pwm_max-pwm_min))
+    ramp_to = int(pwm_min + 0.8*(pwm_max-pwm_min))
     ramp_motor(vehicle, pwm_spin_min, ramp_to, takeoff_sec)
+
+    # spin_motor_sec(vehicle, pwm_min, pwm_max, takeoff_sec, 0.4)
 
     # Hover at 75% for 40 seconds
     spin_motor_sec(vehicle, pwm_min, pwm_max, hover_sec, hover_thr_pct) 
@@ -109,8 +108,8 @@ RCIN_THROTTLE_CHANNEL = 3
 VTOL_MOTOR_CHANNELS = range(5,9)
 # TEST_DURATION_SECONDS = 40
 # Test Parameters
-HOVER_DURATION_SECONDS = 10
-HOVER_THR_PCT = 0.35
+HOVER_DURATION_SECONDS = 5
+HOVER_THR_PCT = 0.75
 
 
 # --------------------------------------
@@ -124,12 +123,6 @@ print("\nConnected to vehicle")
 
 # Backup params
 _arming_check_backup = vehicle.parameters["ARMING_CHECK"]
-
-# Allow VTOL motors output only
-# VTOL motors are on channels 5-8
-brd_safety_mask = int("0b00000011110000", 2)
-vehicle.parameters["BRD_SAFETY_MASK"] = brd_safety_mask
-print(f"\nSet param BRD_SAFETY_MASK = {brd_safety_mask}")
 
 # Get ESC min & max values
 # _q_m_pwm_max = int(vehicle.parameters["Q_M_PWM_MAX"])
