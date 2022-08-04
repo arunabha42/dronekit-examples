@@ -47,14 +47,14 @@ def ramp_motor(vehicle, pwm_start, pwm_stop, duration):
         vehicle.channels.overrides[3] = pwm_stop
         time.sleep(0.25)
 
-def spin_motor_sec(vehicle, pwm_min, pwm_max, duration, thr_out_pct=0.0):
+def spin_motor_sec(vehicle, pwm_min, pwm_max, thr_out_pct=0.0, duration=0):
     
     print(f"\nRunning motor at {int(thr_out_pct*100)}% for {duration} seconds")
     
     pwm_range = pwm_max - pwm_min
     pwm_out = int(pwm_min + pwm_range*thr_out_pct)
     
-    # Overrides to be sent at 4 Hz in case ramp interval greater than 0.25s
+    # Overrides to be sent at 4 Hz for duration greater than 0.25s
     if duration > 0.25:
         start_time = time.time()
         while (time.time()-start_time) <= duration:
@@ -64,11 +64,21 @@ def spin_motor_sec(vehicle, pwm_min, pwm_max, duration, thr_out_pct=0.0):
         vehicle.channels.overrrides[3] = pwm_out
         time.sleep(duration)
 
-def run_motor_profile(vehicle, pwm_min, pwm_max, duration, hover_thr_pct):
+def run_motor_profile(vehicle, pwm_esc, test_profile):
     
-    spool_sec = 3
-    takeoff_sec = 2
-    hover_sec = duration
+    # Unpack profile values
+    spool_pct, spool_time = test_profile["spool"].values()
+    peak_pct, peak_time = test_profile["peak"].values()
+    hover_pct, hover_time = test_profile["hover"].values()
+
+    # Unpack PWM values
+    pwm_min, pwm_max = pwm_esc.values()
+    pwm_range = pwm_max - pwm_min
+
+    # PWM values for each stage
+    spool_pwm = int(pwm_min + (spool_pct * pwm_range))
+    peak_pwm = int(pwm_min + (peak_pct * pwm_range))
+    hover_pwm = int(pwm_min + (hover_pct * pwm_range))
 
     q_m_spin_min = vehicle.parameters["Q_M_SPIN_MIN"]
     pwm_spin_min = int(pwm_min + (q_m_spin_min * (pwm_max-pwm_min)))
@@ -77,16 +87,13 @@ def run_motor_profile(vehicle, pwm_min, pwm_max, duration, hover_thr_pct):
     vehicle.arm(wait=True)
 
     # Spool at Q_M_SPIN_MIN for 2 seconds
-    spin_motor_sec(vehicle, pwm_min, pwm_max, spool_sec, q_m_spin_min)
+    spin_motor_sec(vehicle, pwm_min, pwm_max, spool_pct, spool_time)
 
     # Takeoff - ramp to 80% over 2 seconds
-    ramp_to = int(pwm_min + 0.8*(pwm_max-pwm_min))
-    ramp_motor(vehicle, pwm_spin_min, ramp_to, takeoff_sec)
-
-    # spin_motor_sec(vehicle, pwm_min, pwm_max, takeoff_sec, 0.4)
+    ramp_motor(vehicle, spool_pwm, peak_pwm, peak_time)
 
     # Hover at 75% for 40 seconds
-    spin_motor_sec(vehicle, pwm_min, pwm_max, hover_sec, hover_thr_pct) 
+    spin_motor_sec(vehicle, pwm_min, pwm_max, hover_pct, hover_time) 
 
     # Turn off motors
     print("\nTurning off VTOL motors")
@@ -98,18 +105,26 @@ def run_motor_profile(vehicle, pwm_min, pwm_max, duration, hover_thr_pct):
 # USER PARAMS
 # --------------------------------------
 # CONNECTION_STRING = "com28"
-# CONNECTION_STRING = "tcp:127.0.0.1:5763"
+CONNECTION_STRING = "tcp:127.0.0.1:5763"
 # CONNECTION_STRING = "udp:100.70.12.100:14690"
 
 # CONNECTION_STRING = "tcp:100.93.85.117:5770"
-CONNECTION_STRING = "tcp:127.0.0.1:5770"
+# CONNECTION_STRING = "tcp:127.0.0.1:5770"
 
 RCIN_THROTTLE_CHANNEL = 3
 VTOL_MOTOR_CHANNELS = range(5,9)
-# TEST_DURATION_SECONDS = 40
-# Test Parameters
-HOVER_DURATION_SECONDS = 5
-HOVER_THR_PCT = 0.75
+
+# Test profile parameters
+PWM_ESC = {
+            "min":      1000,
+            "max":      2000
+        }
+
+TEST_PROFILE = {
+                "spool":    { "pct": 0.23, "time": 2 },
+                "peak":     { "pct": 0.72, "time": 4 },
+                "hover":    { "pct": 0.63, "time": 13 }
+            }
 
 
 # --------------------------------------
@@ -139,7 +154,7 @@ try:
     
     test_start_time = time.time()
     # Arm vehicle, run motors & disarm
-    run_motor_profile(vehicle, _q_m_pwm_min, _q_m_pwm_max, HOVER_DURATION_SECONDS, HOVER_THR_PCT)
+    run_motor_profile(vehicle, PWM_ESC, TEST_PROFILE)
     print(f"Time taken for motor profile test: {int(time.time() - test_start_time)} seconds")
 
     # Reset parameters
