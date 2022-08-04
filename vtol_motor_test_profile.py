@@ -47,12 +47,9 @@ def ramp_motor(vehicle, pwm_start, pwm_stop, duration):
         vehicle.channels.overrides[3] = pwm_stop
         time.sleep(0.25)
 
-def spin_motor_sec(vehicle, pwm_min, pwm_max, thr_out_pct=0.0, duration=0):
+def spin_motor_sec(vehicle, pwm_out, duration=0):
     
-    print(f"\nRunning motor at {int(thr_out_pct*100)}% for {duration} seconds")
-    
-    pwm_range = pwm_max - pwm_min
-    pwm_out = int(pwm_min + pwm_range*thr_out_pct)
+    print(f"\nRunning motor at {pwm_out} us for {duration} seconds")
     
     # Overrides to be sent at 4 Hz for duration greater than 0.25s
     if duration > 0.25:
@@ -87,13 +84,13 @@ def run_motor_profile(vehicle, pwm_esc, test_profile):
     vehicle.arm(wait=True)
 
     # Spool at Q_M_SPIN_MIN for 2 seconds
-    spin_motor_sec(vehicle, pwm_min, pwm_max, spool_pct, spool_time)
+    spin_motor_sec(vehicle, spool_pwm, spool_time)
 
     # Takeoff - ramp to 80% over 2 seconds
     ramp_motor(vehicle, spool_pwm, peak_pwm, peak_time)
 
     # Hover at 75% for 40 seconds
-    spin_motor_sec(vehicle, pwm_min, pwm_max, hover_pct, hover_time) 
+    spin_motor_sec(vehicle, hover_pwm, hover_time) 
 
     # Turn off motors
     print("\nTurning off VTOL motors")
