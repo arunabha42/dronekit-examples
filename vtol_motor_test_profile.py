@@ -147,7 +147,7 @@ try:
 except KeyboardInterrupt:
         print("\nAborted by user, shutting motor...")
         vehicle.channels.overrides = {'3': PWM_ESC["min"]}
-        vehicle.disarm()
+        vehicle.disarm(wait=True)
         _reset_original_params(vehicle, VTOL_MOTOR_CHANNELS, _arming_check_backup)
         sys.exit(0)
 
