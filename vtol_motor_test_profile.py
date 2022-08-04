@@ -69,18 +69,15 @@ def run_motor_profile(vehicle, pwm_esc, test_profile):
     hover_pct, hover_time = test_profile["hover"].values()
 
     # Unpack PWM values
-    pwm_min, pwm_max = pwm_esc.values()
+    pwm_min, pwm_max = (pwm_esc.values())
     pwm_range = pwm_max - pwm_min
 
     # PWM values for each stage
     spool_pwm = int(pwm_min + (spool_pct * pwm_range))
     peak_pwm = int(pwm_min + (peak_pct * pwm_range))
-    hover_pwm = int(pwm_min + (hover_pct * pwm_range))
+    hover_pwm = int(pwm_min + (hover_pct * pwm_range))    
 
-    q_m_spin_min = vehicle.parameters["Q_M_SPIN_MIN"]
-    pwm_spin_min = int(pwm_min + (q_m_spin_min * (pwm_max-pwm_min)))
-    
-
+    # Arm vehicle
     vehicle.arm(wait=True)
 
     # Spool at Q_M_SPIN_MIN for 2 seconds
@@ -94,8 +91,7 @@ def run_motor_profile(vehicle, pwm_esc, test_profile):
 
     # Turn off motors
     print("\nTurning off VTOL motors")
-    _pwm_out = int(pwm_min)
-    vehicle.channels.overrides = {'3': _pwm_out}
+    vehicle.channels.overrides = {'3': int(pwm_min)}
     vehicle.disarm(wait=True)
 
 # --------------------------------------
@@ -159,7 +155,7 @@ try:
 
 except KeyboardInterrupt:
         print("\nAborted by user, shutting motor...")
-        vehicle.channels.overrides = {'3': _q_m_pwm_min}
+        vehicle.channels.overrides = {'3': PWM_ESC["min"]}
         vehicle.disarm()
         _reset_original_params(vehicle, VTOL_MOTOR_CHANNELS, _arming_check_backup)
         sys.exit(0)
