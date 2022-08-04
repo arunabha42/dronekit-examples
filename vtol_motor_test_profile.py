@@ -97,12 +97,7 @@ def run_motor_profile(vehicle, pwm_esc, test_profile):
 # --------------------------------------
 # USER PARAMS
 # --------------------------------------
-# CONNECTION_STRING = "com28"
-CONNECTION_STRING = "tcp:127.0.0.1:5763"
-# CONNECTION_STRING = "udp:100.70.12.100:14690"
-
-# CONNECTION_STRING = "tcp:100.93.85.117:5770"
-# CONNECTION_STRING = "tcp:127.0.0.1:5770"
+CONNECTION_STRING = "tcp:127.0.0.1:5770"
 
 VTOL_MOTOR_CHANNELS = range(5,9)
 
@@ -113,9 +108,9 @@ PWM_ESC = {
         }
 
 TEST_PROFILE = {
-                "spool":    { "pct": 0.23, "time": 2 },
-                "peak":     { "pct": 0.72, "time": 4 },
-                "hover":    { "pct": 0.63, "time": 13 }
+                "spool":    { "pct": 0.12, "time": 3 },
+                "peak":     { "pct": 0.80, "time": 3 },
+                "hover":    { "pct": 0.70, "time": 10 }
             }
 
 
@@ -124,7 +119,6 @@ TEST_PROFILE = {
 # --------------------------------------
 
 # Connect to vehicle
-# vehicle = connect(CONNECTION_STRING, baud=57600, wait_ready=True)
 vehicle = connect(CONNECTION_STRING, wait_ready=True)
 print("\nConnected to vehicle")
 
