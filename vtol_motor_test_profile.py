@@ -11,6 +11,25 @@ from pymavlink import mavutil
 '''
 
 # --------------------------------------
+# USER PARAMS
+# --------------------------------------
+CONNECTION_STRING = "tcp:127.0.0.1:5770"
+
+VTOL_MOTOR_CHANNELS = range(5,9)
+
+# Test profile parameters
+PWM_ESC = {
+            "min":      1000,
+            "max":      2000
+        }
+
+TEST_PROFILE = {
+                "spool":    { "pct": 0.12, "time": 3 },
+                "peak":     { "pct": 0.80, "time": 3 },
+                "hover":    { "pct": 0.70, "time": 10 }
+            }
+
+# --------------------------------------
 # FUNCTION DEFINITIONS
 # --------------------------------------
 
@@ -51,7 +70,7 @@ def spin_motor_sec(vehicle, pwm_out, duration=0):
     
     print(f"\nRunning motor at {pwm_out} us for {duration} seconds")
     
-    # Overrides to be sent at 4 Hz for duration greater than 0.25s
+    # Send overrides at 4 Hz for duration greater than 0.25s
     if duration > 0.25:
         start_time = time.time()
         while (time.time()-start_time) <= duration:
@@ -94,24 +113,6 @@ def run_motor_profile(vehicle, pwm_esc, test_profile):
     vehicle.channels.overrides = {'3': int(pwm_min)}
     vehicle.disarm(wait=True)
 
-# --------------------------------------
-# USER PARAMS
-# --------------------------------------
-CONNECTION_STRING = "tcp:127.0.0.1:5770"
-
-VTOL_MOTOR_CHANNELS = range(5,9)
-
-# Test profile parameters
-PWM_ESC = {
-            "min":      1000,
-            "max":      2000
-        }
-
-TEST_PROFILE = {
-                "spool":    { "pct": 0.12, "time": 3 },
-                "peak":     { "pct": 0.80, "time": 3 },
-                "hover":    { "pct": 0.70, "time": 10 }
-            }
 
 
 # --------------------------------------
