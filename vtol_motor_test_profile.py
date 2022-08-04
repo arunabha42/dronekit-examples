@@ -80,13 +80,13 @@ def run_motor_profile(vehicle, pwm_esc, test_profile):
     # Arm vehicle
     vehicle.arm(wait=True)
 
-    # Spool at Q_M_SPIN_MIN for 2 seconds
+    # Spool stage
     spin_motor_sec(vehicle, spool_pwm, spool_time)
 
-    # Takeoff - ramp to 80% over 2 seconds
+    # Peak stage
     ramp_motor(vehicle, spool_pwm, peak_pwm, peak_time)
 
-    # Hover at 75% for 40 seconds
+    # Hover stage
     spin_motor_sec(vehicle, hover_pwm, hover_time) 
 
     # Turn off motors
@@ -131,15 +131,6 @@ print("\nConnected to vehicle")
 
 # Backup params
 _arming_check_backup = vehicle.parameters["ARMING_CHECK"]
-
-# Get ESC min & max values
-# _q_m_pwm_max = int(vehicle.parameters["Q_M_PWM_MAX"])
-# _q_m_pwm_min = int(vehicle.parameters["Q_M_PWM_MIN"])
-_q_m_pwm_max = 2000
-_q_m_pwm_min = 1000
-
-print(f"Q_M_PWM_MIN = {_q_m_pwm_min} us")
-print(f"Q_M_PWM_MAX = {_q_m_pwm_max} us")
 
 try:
     # Setup CH 5-8 for passthrough from RCIN3
