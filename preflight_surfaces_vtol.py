@@ -1,6 +1,4 @@
-from imghdr import tests
 import time
-from tkinter import Button
 from dronekit import connect
 from pymavlink import mavutil
 
@@ -62,7 +60,7 @@ def backup_and_set_disabled():
 
 
 print("Connecting to vehicle...")
-vehicle = connect("tcp:127.0.0.1:5762")
+vehicle = connect("tcp:127.0.0.1:5770")
 # vehicle = connect("tcp:100.125.149.27:14550")
 
 # vehicle = connect("COM15")
@@ -93,16 +91,16 @@ for input in [x for x in range(1,5) if x != 3]:
     # Set channel to MIN for 3s
     print(f"{channels[input-1]} - MIN")
     vehicle.channels.overrides[input] = rcin_min
-    time.sleep(2)
+    time.sleep(1)
     
     # Set channel to MAX for 3s
     print(f"{channels[input-1]} - MAX")
     vehicle.channels.overrides[input] = rcin_max
-    time.sleep(2)
+    time.sleep(1)
 
     # Clear all overrides
     vehicle.channels.overrides[input] = int(vehicle.parameters[f"RC{input}_TRIM"])
-    time.sleep(2)
+    time.sleep(1)
 
 
 print("\nChanging mode to FBWA")
@@ -113,11 +111,11 @@ print("\nTesting rudder mixing")
 
 print("ROLL MAX - Rudder Mix Check")
 vehicle.channels.overrides[1] = int(vehicle.parameters["RC1_MAX"])
-time.sleep(2)
+time.sleep(1)
 
 print("ROLL MIN - Rudder Mix Check")
 vehicle.channels.overrides[1] = int(vehicle.parameters["RC1_MIN"])
-time.sleep(2)
+time.sleep(1)
 
 # Clear all overrides
 vehicle.channels.overrides[1] = int(vehicle.parameters[f"RC1_TRIM"])

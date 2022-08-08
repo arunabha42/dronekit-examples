@@ -25,8 +25,8 @@ PWM_ESC = {
 
 TEST_PROFILE = {
                 "spool":    { "pct": 0.12, "time": 3 },
-                "peak":     { "pct": 0.80, "time": 3 },
-                "hover":    { "pct": 0.70, "time": 10 }
+                "peak":     { "pct": 0.70, "time": 3 },
+                "hover":    { "pct": 0.65, "time": 5 }
             }
 
 # --------------------------------------
@@ -50,7 +50,7 @@ def _reset_original_params(vehicle, vtol_motor_channels, arming_check):
 def ramp_motor(vehicle, pwm_start, pwm_stop, duration):
 
     start_time = time.time()
-    ramp_steps = 10
+    ramp_steps = 8
     ramp_increment = int((pwm_stop - pwm_start)/ramp_steps)
 
     print(f"\nRamp: {pwm_start} us to {pwm_stop}")
