@@ -24,9 +24,9 @@ PWM_ESC = {
         }
 
 TEST_PROFILE = {
-                "spool":    { "pct": 0.12, "time": 3 },
-                "peak":     { "pct": 0.70, "time": 3 },
-                "hover":    { "pct": 0.65, "time": 5 }
+                "spool":    { "pct": 0.15, "time": 3 },
+                "peak":     { "pct": 0.80, "time": 3 },
+                "hover":    { "pct": 0.75, "time": 15 }
             }
 
 # --------------------------------------
@@ -37,6 +37,7 @@ def _set_passthrough_rcin3(vehicle, vtol_motor_channels):
     # Set channels to passthrough for RCIN3
     for channel in vtol_motor_channels:
         vehicle.parameters[f"SERVO{channel}_FUNCTION"] = 53
+        vehicle.parameters[f"SERVO{channel}_TRIM"] = 1000
 
 def _reset_original_params(vehicle, vtol_motor_channels, arming_check):    
     
@@ -46,6 +47,7 @@ def _reset_original_params(vehicle, vtol_motor_channels, arming_check):
     # Reset to VTOL motor functions
     for channel, servo_fn in zip(vtol_motor_channels, range(33,37)):
         vehicle.parameters[f"SERVO{channel}_FUNCTION"] = servo_fn
+        vehicle.parameters[f"SERVO{channel}_TRIM"] = 1500
 
 def ramp_motor(vehicle, pwm_start, pwm_stop, duration):
 
