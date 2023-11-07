@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 dronekit = "*"
 pyserial = "*"
+paho-mqtt = "*"
+keyboard = "*"
 
 [dev-packages]
 
