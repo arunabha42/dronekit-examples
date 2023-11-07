@@ -60,7 +60,10 @@ def backup_and_set_disabled():
 
 
 print("Connecting to vehicle...")
-vehicle = connect("tcp:127.0.0.1:5770")
+vehicle = connect("tcp:127.0.0.1:5780")
+
+# vehicle = connect("tcp:127.0.0.1:5762")
+# vehicle = connect("tcp:127.0.0.1:5770")
 # vehicle = connect("tcp:100.125.149.27:14550")
 
 # vehicle = connect("COM15")
@@ -69,13 +72,20 @@ print("Connected to vehicle")
 # Set mode to manual
 vehicle.mode ="MANUAL"
 print("\nMode changed to Manual")
-time.sleep(2)
+# time.sleep(2)
+
+wait_time = 5
+
+for i in range(wait_time):
+    print(f"{wait_time-i} Waiting for parameters...")
+    time.sleep(1)
 
 # Set board safety to enable specific outputs
 # vehicle.parameters["BRD_SAFETY_MASK"] = 1799
-vehicle.parameters["BRD_SAFETY_MASK"] = int("0b11100000111", 2)
+# vehicle.parameters["BRD_SAFETY_MASK"] = int("0b11100000111", 2)
 
 channels = [ "ROLL", "PITCH", "THROTTLE", "YAW"]
+rc_override_duration = 1
 
 # Set CH 1-4
 for input in [x for x in range(1,5) if x != 3]:
@@ -84,45 +94,55 @@ for input in [x for x in range(1,5) if x != 3]:
 
     print(f"\nTesting channel: {input}")
     
-    # Get MIN & MAX for current RCIN channel
+    # Get MIN, MAX & TRIM for current RCIN channel
     rcin_max = int(vehicle.parameters[f"RC{input}_MAX"])
+    rcin_min = int(vehicle.parameters[f"RC{input}_MIN"])
     rcin_min = int(vehicle.parameters[f"RC{input}_MIN"])
 
     # Set channel to MIN for 3s
-    print(f"{channels[input-1]} - MIN")
+    print(f"{channels[input-1]} - MIN - {rcin_min} us")
     vehicle.channels.overrides[input] = rcin_min
-    time.sleep(1)
+    time.sleep(rc_override_duration)
     
+    # Set to neutral
+    vehicle.channels.overrides[input] = int(vehicle.parameters[f"RC{input}_TRIM"])
+    time.sleep(rc_override_duration)
+
     # Set channel to MAX for 3s
-    print(f"{channels[input-1]} - MAX")
+    print(f"{channels[input-1]} - MAX - {rcin_max} us")
     vehicle.channels.overrides[input] = rcin_max
-    time.sleep(1)
+    time.sleep(rc_override_duration)
 
     # Clear all overrides
     vehicle.channels.overrides[input] = int(vehicle.parameters[f"RC{input}_TRIM"])
-    time.sleep(1)
+    time.sleep(rc_override_duration)
 
 
 print("\nChanging mode to FBWA")
 vehicle.mode = "FBWA"
-time.sleep(1)
+time.sleep(rc_override_duration)
 
 print("\nTesting rudder mixing")
 
 print("ROLL MAX - Rudder Mix Check")
 vehicle.channels.overrides[1] = int(vehicle.parameters["RC1_MAX"])
-time.sleep(1)
+time.sleep(rc_override_duration)
+
+# Set surfaces to neutral
+vehicle.channels.overrides[1] = int(vehicle.parameters[f"RC1_TRIM"])
+time.sleep(rc_override_duration)
 
 print("ROLL MIN - Rudder Mix Check")
 vehicle.channels.overrides[1] = int(vehicle.parameters["RC1_MIN"])
-time.sleep(1)
+time.sleep(rc_override_duration)
 
 # Clear all overrides
 vehicle.channels.overrides[1] = int(vehicle.parameters[f"RC1_TRIM"])
-time.sleep(1)
+time.sleep(rc_override_duration)
 
 # Set board safety back to original
 vehicle.parameters["BRD_SAFETY_MASK"] = 0
 
 print("\nChanging mode to Manual")
 vehicle.mode ="MANUAL"
+time.sleep(1)
