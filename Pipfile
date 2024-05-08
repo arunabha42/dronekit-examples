@@ -8,6 +8,8 @@ dronekit = "*"
 pyserial = "*"
 paho-mqtt = "*"
 keyboard = "*"
+matplotlib = "*"
+pandas = "*"
 
 [dev-packages]
 
